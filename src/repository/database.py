@@ -62,7 +62,7 @@ class BaseDeDatos:
         cursor.execute("""
             SELECT estudiantes.cedula, estudiantes.nombre
             FROM inscripciones
-            JOIN estudiantes ON inscripciones.cedula = estudiantes.cedula
+            JOIN estudiantes ON inscripciones.cedula_estudiante = estudiantes.cedula
             WHERE inscripciones.codigo_materia = ?
         """, (codigo,))
         return cursor.fetchall()

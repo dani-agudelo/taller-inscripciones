@@ -1,10 +1,10 @@
-from database import BaseDeDatos
-from consolidador import ConsolidadorInscripciones
+from src.repository.database import BaseDeDatos
+from src.modelos.consolidado import ConsolidadoInscripciones
 
 
 def menu():
     base_datos = BaseDeDatos()
-    consolidador = ConsolidadorInscripciones(base_datos)
+    consolidador = ConsolidadoInscripciones(base_datos)
 
     while True:
         print("\n--- Menú Principal ---")

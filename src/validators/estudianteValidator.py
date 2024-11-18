@@ -1,5 +1,6 @@
 class estudianteValidator:
     def __init__(self):
+        pass
         
     def validar_estudiante(self, cedula, nombre):
        # la cedula debe ser un número, debe tener 7 dígitos y no debe empezar por 0

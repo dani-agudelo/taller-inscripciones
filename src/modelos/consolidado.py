@@ -1,41 +1,53 @@
-from database import BaseDeDatos
-
-from validators.estudianteValidator import EstudianteValidator
-from validators.materiaValidator import MateriaValidator
-
+from src.repository.database import BaseDeDatos
+from src.validators.estudianteValidator import estudianteValidator
+from src.validators.materiaValidator import materiaValidator
+from src.utils.lector import Lector
+from src.modelos.estudiante import Estudiante
+from src.modelos.materia import Materia
+from src.modelos.inscripcion import Inscripcion
 
 
 class ConsolidadoInscripciones:
     def __init__(self, base_datos: BaseDeDatos):
+        self.lector = Lector
         self.base_datos = base_datos
-        self.estudiantes = {}
-        self.materias = {}
-        self.validatorEstudiante = EstudianteValidator()
-        self.validatorMateria
+        self.estudiante= Estudiante
+        self.materia = Materia
+        self.inscripcion = Inscripcion
+        self.validatorEstudiante = estudianteValidator()
+        self.validatorMateria= materiaValidator()
 
     def procesar_linea(self, linea: str):
         try:
             cedula, nombre, codigo_materia, nombre_materia = map(str.strip, linea.split(','))
             # Insertar los datos en los diccionarios para validar datos en formato correcto
-            self.estudiantes[cedula] = nombre
-            self.materias[codigo_materia] = nombre_materia
-            print(f"Estudiante: {cedula} - {nombre}")
-            print(f"Materia: {codigo_materia} - {nombre_materia}")
-            # llamamos a validators para validar los datos
-            # validator estudianteValidator
-            # validator materiaValidator
-            # validator inscripcionValidator
             boolean_estudiante = self.validatorEstudiante.validar_estudiante(cedula, nombre)
+            boolean_materia = self.validatorMateria.validar_materia(codigo_materia, nombre_materia)
+                        
+            if boolean_estudiante == False:
+                print("Error en la validacion de estudiante")
+                return
+            if boolean_materia == False:
+                print("Error en la validacion de materia")
+                return
             
-            self.base_datos.insertar_estudiante(cedula, nombre)
-            self.base_datos.insertar_materia(codigo_materia, nombre_materia)
-            self.base_datos.insertar_inscripcion(cedula, codigo_materia)
+            #si las validaciones son correctas insertamos los datos en la base de datos
+            if boolean_estudiante == True and boolean_materia == True:
+                # creamos los objetos estudiante, materia e inscripcion
+                self.estudiante = Estudiante(cedula, nombre)
+                self.materia = Materia(codigo_materia, nombre_materia)
+                self.inscripcion = Inscripcion(self.estudiante, self.materia)
+                print("Datos validados correctamente")
+                self.base_datos.insertar_estudiante(self.estudiante.cedula, self.estudiante.nombre)
+                self.base_datos.insertar_materia(self.materia.codigo, self.materia.nombre)
+                self.base_datos.insertar_inscripcion(self.estudiante.cedula, self.materia.codigo)
+                
         except ValueError:
             print(f"Línea inválida ignorada: {linea}")
 
     def consolidar_archivo(self, ruta: str):
          # Crear una instancia de Lector con la ruta del archivo
-            lector = Lector(ruta)
+            lector = self.lector(ruta)
             contenido = lector.lector_archivo_texto()
             print("Contenido del archivo:")
             print(contenido)
