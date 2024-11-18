@@ -66,3 +66,13 @@ class BaseDeDatos:
             WHERE inscripciones.codigo_materia = ?
         """, (codigo,))
         return cursor.fetchall()
+    
+    def obtener_estudiante_por_cedula(self, cedula: str):
+        cursor = self.conexion.cursor()
+        cursor.execute("""
+            SELECT cedula, nombre
+            FROM estudiantes
+            WHERE cedula = ?
+        """, (cedula,))
+        return cursor.fetchall()
+

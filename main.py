@@ -1,5 +1,6 @@
 from src.repository.database import BaseDeDatos
 from src.modelos.consolidado import ConsolidadoInscripciones
+from src.utils.exportaciones import exportar_a_json, exportar_a_csv
 
 
 def menu():
@@ -11,7 +12,9 @@ def menu():
         print("1. Cargar archivo de inscripciones")
         print("2. Mostrar materias inscritas por estudiante")
         print("3. Mostrar estudiantes inscritos en una materia")
-        print("4. Salir")
+        print("4. Mostrar estudiante")
+        print("5. Convertir a JSON/CSV")
+        print("6. Salir")
 
         opcion = input("Seleccione una opción: ")
         if opcion == "1":
@@ -27,7 +30,7 @@ def menu():
             if materias:
                 print(f"\nMaterias inscritas por el estudiante {cedula}:")
                 for codigo, nombre in materias:
-                    print(f"- {codigo}: {nombre}")
+                    print(f"- Código: {codigo}, Nombre: {nombre}")
             else:
                 print(f"No se encontraron materias para el estudiante {cedula}.")
         elif opcion == "3":
@@ -36,14 +39,29 @@ def menu():
             if estudiantes:
                 print(f"\nEstudiantes inscritos en la materia {codigo}:")
                 for cedula, nombre in estudiantes:
-                    print(f"- {nombre} ({cedula})")
+                    print(f"- Nombre: {nombre}, Cédula: ({cedula})")
             else:
                 print(f"No se encontraron estudiantes para la materia {codigo}.")
         elif opcion == "4":
+            cedula_estudiante = input("Ingrese la cédula del estudiante: ")
+            estudiante = base_datos.obtener_estudiante_por_cedula(cedula_estudiante)
+            if estudiante:
+                print(f"\nEstudiante con cédula {cedula_estudiante}:")
+                for cedula, nombre in estudiante:
+                    print(f"- Cédula: {cedula}, Nombre: {nombre}")
+            else:
+                print(f"No se encontró un estudiante con la cédula {cedula_estudiante}.")
+        elif opcion == "5":
+            tipo_exportacion = input("¿Desea exportar a JSON o CSV? (j/c): ").lower()
+            if tipo_exportacion == "j":
+                exportar_a_json(base_datos)
+            elif tipo_exportacion == "c":
+                exportar_a_csv(base_datos)
+            else:
+                print("Opción inválida.")
+        elif opcion == "6":
             print("Saliendo del programa...")
             break
-        else:
-            print("Opción inválida. Por favor, intente de nuevo.")
 
 
 if __name__ == "__main__":
